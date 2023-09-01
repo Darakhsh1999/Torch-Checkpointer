@@ -114,9 +114,13 @@ class CheckpointTree():
 
         tree_nodes = self.preorder_traversal()
 
-        print("-------------")
-        for n in tree_nodes:
-            print(n.ID)
+        # Plot nodes
+        for node in tree_nodes:
+            ID = node.ID
+            x = node.branch
+            y = len(ID)
+            plt.scatter(x, y, marker="o", c="blue", s=400, edgecolors="black")
+            plt.text(x+0.25, y, s=f"{node.val:.2f}", verticalalignment="center", horizontalalignment="center", fontsize=14)
 
         # Draw lines
         branch_idx = 0
@@ -131,8 +135,8 @@ class CheckpointTree():
                 x1 = branch_node.branch
                 x2 = target_node.branch
 
-                y1 = len(branch_node.ID)-1
-                y2 = tree_nodes[node_idx+1].epoch
+                y1 = len(branch_node.ID)
+                y2 = target_node.epoch
                 plt.plot([x1,x2],[y1,y2], "k-", linewidth=2)
                 branch_idx += 1
                 continue
@@ -144,14 +148,6 @@ class CheckpointTree():
             plt.plot([x,x],[y1,y2], "k-", linewidth=3)
 
 
-        # Plot nodes
-        for node in tree_nodes:
-            ID = node.ID
-            x = node.branch
-            y = len(ID)
-            plt.scatter(x, y, marker="o", c="blue", s=200, edgecolors="black")
-            node_text = f"{node.val:.2f}, {node.diff:.3f}, {node.epoch}, {node.branch}"
-            plt.text(x+0.25, y, s=node_text, verticalalignment="center", horizontalalignment="center", fontsize=14)
         
         plt.xticks(np.arange(1,self.tree_branches+1))
         plt.yticks(np.arange(1,self.tree_height+1))

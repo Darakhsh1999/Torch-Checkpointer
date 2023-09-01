@@ -11,7 +11,7 @@ from checkpointer import TorchCheckpointer
 # Simulation parameters 
 batch_size = 64
 lr = 0.001
-n_epochs = 12
+n_epochs = 20
 n_branches = 4
 device = torch.device("cuda" if torch.cuda.is_available else "cpu")
 
