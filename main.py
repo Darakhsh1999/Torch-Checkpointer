@@ -11,8 +11,8 @@ from checkpointer import TorchCheckpointer
 # Simulation parameters 
 batch_size = 64
 lr = 0.001
-n_epochs = 20
-n_branches = 4
+n_epochs = 16
+n_branches = 6
 device = torch.device("cuda" if torch.cuda.is_available else "cpu")
 
 # Initialize data
@@ -53,3 +53,5 @@ checkpointer = TorchCheckpointer(
 checkpointer.train(model=model, optimizer=optimizer, n_epochs=n_epochs)
 
 checkpointer.tree.print_tree()
+
+checkpointer.tree.print_3d_tree()

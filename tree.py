@@ -103,7 +103,6 @@ class CheckpointTree():
     def preorder_traversal(self, node=None, root=True):
         
         if root: node = self.root
-        print(f"ID = {node.ID}, val = {node.val}")
         node_path = [node]
         if node.left: node_path +=  self.preorder_traversal(node.left, root=False)
         if node.right: node_path += self.preorder_traversal(node.right, root=False)
@@ -119,7 +118,7 @@ class CheckpointTree():
             ID = node.ID
             x = node.branch
             y = len(ID)
-            plt.scatter(x, y, marker="o", c="blue", s=400, edgecolors="black")
+            plt.scatter(x, y, marker="o", c="blue", s=200, edgecolors="black")
             plt.text(x+0.25, y, s=f"{node.val:.2f}", verticalalignment="center", horizontalalignment="center", fontsize=14)
 
         # Draw lines
@@ -147,11 +146,61 @@ class CheckpointTree():
 
             plt.plot([x,x],[y1,y2], "k-", linewidth=3)
 
-
         
         plt.xticks(np.arange(1,self.tree_branches+1))
         plt.yticks(np.arange(1,self.tree_height+1))
+        plt.xlabel("branch")
+        plt.ylabel("epoch")
         plt.grid()
+        plt.show()
+    
+    def print_3d_tree(self):
+
+        tree_nodes = self.preorder_traversal()
+
+        ax = plt.figure().add_subplot(projection='3d')
+
+        # Plot nodes
+        for node in tree_nodes:
+            ID = node.ID
+            x = node.branch
+            y = len(ID)
+            z = node.val
+            ax.scatter3D(x, y, z, marker="o", c="blue", s=200, edgecolors="black")
+
+        # Draw lines
+        branch_idx = 0
+        for node_idx, node1 in enumerate(tree_nodes):
+
+            if (node_idx == len(tree_nodes)-1): continue # Final node
+
+            if (node1.epoch == self.tree_height): # End of branch
+                branch_node: Node = self.branch_nodes[branch_idx]
+                target_pos = branch_node.ID + "0"
+                target_node: Node = self.find(target_pos)
+                x1 = branch_node.branch
+                x2 = target_node.branch
+                y1 = len(branch_node.ID)
+                y2 = target_node.epoch
+                z1 = branch_node.val
+                z2 = target_node.val
+                ax.plot3D([x1,x2],[y1,y2],[z1,z2], "k-", linewidth=2)
+                branch_idx += 1
+                continue
+
+            x = node1.branch
+            y1 = node1.epoch
+            y2 = tree_nodes[node_idx+1].epoch
+            z1 = node1.val
+            z2 = tree_nodes[node_idx+1].val
+
+            ax.plot3D([x,x],[y1,y2],[z1,z2], "k-", linewidth=2)
+
+        plt.xticks(np.arange(1,self.tree_branches+1))
+        plt.yticks(np.arange(1,self.tree_height+1))
+        ax.set_xlabel("branch")
+        ax.set_ylabel("epoch")
+        ax.set_zlabel("accuracy")
         plt.show()
     
 
