@@ -1,0 +1,3 @@
+- upload to github
+- make readme
+
