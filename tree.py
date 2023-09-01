@@ -24,10 +24,20 @@ class CheckpointTree():
         self.pos = "1" # points to the next node
         self.old_key = None
         self.n_branches = 1
-        self.max_delta_nodes = []
+        self.branch_nodes = []
         self.branch_pos = []
         self.complete = False
-    
+
+    def find(self, pos):
+        """ Finds node in tree given pos """
+        node = self.root
+        for c in pos[1:]:
+            if c == "1":
+                node = node.left
+            else:
+                node = node.right
+        return node
+
     def insert(self, value: float):
         """ Insert value into the checkpoint tree """
 
@@ -61,28 +71,19 @@ class CheckpointTree():
             self.n_branches += 1
             if (self.n_branches == 1+self.tree_branches): return -1, key # Tree complete
             self.find_branch_point()
-            self.max_delta_nodes.append(self.max_absolute_delta_node)
+            self.branch_nodes.append(self.find(self.branch_point))
             self.branch_pos.append(self.branch_point)
             return 1, key
         return 0, key
     
-    def find(self, pos):
-        """ Finds node in tree given pos """
-        node = self.root
-        for c in pos[1:]:
-            if c == "1":
-                node = node.left
-            else:
-                node = node.right
-        return node
     
     def find_branch_point(self):
         """ Preorder traversal of binary tree """
 
         self.max_absolute_delta = 0.0
-        self.max_absolute_delta_node = None
+        self.max_absolute_delta_pos = "1"
         self.traverse(self.root)
-        self.branch_point: str = self.max_absolute_delta_node.ID[:-1]
+        self.branch_point: str = self.max_absolute_delta_pos[:-1]
         self.pos = self.branch_point + "0" # branch right
         self.old_key = int(self.branch_point, 2)
     
@@ -93,7 +94,7 @@ class CheckpointTree():
 
         if (abs(node.diff) > self.max_absolute_delta) and (node.ID[:-1] not in self.branch_pos):
             self.max_absolute_delta = node.diff
-            self.max_absolute_delta_node = node
+            self.max_absolute_delta_pos = node.ID
         
         if node.left: self.traverse(node.left)
 
@@ -124,8 +125,9 @@ class CheckpointTree():
             if (node_idx == len(tree_nodes)-1): continue # Final node
 
             if (node1.epoch == self.tree_height): # End of branch
-                branch_node: Node = self.max_delta_nodes[branch_idx]
-                target_node = self.find(branch_node.ID+"0")
+                branch_node: Node = self.branch_nodes[branch_idx]
+                target_pos = branch_node.ID + "0"
+                target_node: Node = self.find(target_pos)
                 x1 = branch_node.branch
                 x2 = target_node.branch
 
